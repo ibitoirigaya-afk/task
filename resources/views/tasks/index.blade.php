@@ -7,75 +7,84 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
     <style>
-        /* 完了済みタスクのスタイル */
-        .completed { 
-            text-decoration: line-through; 
-            color: #adb5bd; 
-            background-color: #f8f9fa !important; 
+        body { background-color: #f4f7f6; }
+        .completed { text-decoration: line-through; color: #adb5bd; background-color: #fafafa !important; }
+        
+        /* 基本のカードスタイル */
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border: none;
         }
-        /* 左側の一覧エリアの高さ固定とスクロール設定 */
-        .table-container { 
-            height: 85vh; 
-            overflow-y: auto; 
-            background: white; 
-            border-radius: 0 0 10px 10px; 
+
+        /* --- レスポンシブ制御 --- */
+        
+        /* PCサイズ (992px以上) */
+        @media (min-width: 992px) {
+            .scroll-area {
+                height: 85vh;
+                overflow-y: auto;
+            }
+            #calendar-container {
+                height: 85vh;
+            }
         }
-        /* カレンダーの高さ固定 */
-        .fc { 
-            background: white; 
-            padding: 15px; 
-            border-radius: 10px; 
-            height: 85vh; 
+
+        /* スマホ・タブレットサイズ (992px未満) */
+        @media (max-width: 991.98px) {
+            .scroll-area {
+                height: auto; /* スクロールさせず全表示 */
+            }
+            #calendar-container {
+                height: auto;
+                min-height: 600px; /* カレンダーが潰れないよう最低高さを確保 */
+            }
         }
-        /* 状態バッジの微調整 */
+
         .badge-status { 
             font-size: 0.75rem; 
             font-weight: bold; 
-            padding: 0.4em 0.7em;
-            border-radius: 50px; /* 丸みのあるデザイン */
+            border-radius: 50px; 
+            padding: 0.4em 0.8em;
         }
-        /* テーブルのセル内の縦位置を中央に */
         .table td { vertical-align: middle; }
     </style>
 </head>
-<body class="bg-light">
+<body>
 
 <div class="container-fluid py-4">
     <div class="row">
-        <!-- 左側：タスク一覧 (幅 5/12) -->
+        <!-- 左側：タスク一覧 -->
         <div class="col-lg-5 px-3">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h1 class="h5 mb-0">タスク一覧</h1>
-                    <a href="/tasks/create" class="btn btn-light btn-sm fw-bold">＋ 新規作成</a>
+            <div class="card dashboard-card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center border-0 py-3">
+                    <h1 class="h5 mb-0 fw-bold">タスク一覧</h1>
+                    <a href="/tasks/create" class="btn btn-light btn-sm fw-bold shadow-sm">＋ 新規作成</a>
                 </div>
-                <div class="table-container">
+                <div class="scroll-area">
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th style="width: 45px;" class="text-center">完了</th>
+                                <th style="width: 50px;" class="text-center">完了</th>
                                 <th>内容 / 状態</th>
-                                <th style="width: 90px;" class="text-center">期限</th>
+                                <th style="width: 80px;" class="text-center">期限</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($tasks as $task)
                             @php
-                                // --- 色判定ロジック（一覧・バッジ・カレンダーで共通） ---
-                                $color = '#6c757d'; // デフォルト：グレー
+                                $color = '#6c757d';
                                 if (!$task->is_completed) {
                                     if ($task->due_date) {
                                         $diff = \Carbon\Carbon::now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($task->due_date), false);
-                                        if($diff <= 3) $color = '#dc3545';      // 赤
-                                        elseif($diff <= 7) $color = '#ffc107';  // 黄
-                                        elseif($diff >= 30) $color = '#198754'; // 緑
-                                        else $color = '#0dcaf0';                // 水色
+                                        if($diff <= 3) $color = '#dc3545';
+                                        elseif($diff <= 7) $color = '#ffc107';
+                                        elseif($diff >= 30) $color = '#198754';
+                                        else $color = '#0dcaf0';
                                     }
-                                } else {
-                                    $color = '#adb5bd'; // 完了済み：薄いグレー
-                                }
-                                
-                                // 文字色の判定（黄色背景の時だけ黒文字にする）
+                                } else { $color = '#adb5bd'; }
                                 $textColor = ($color === '#ffc107') ? '#000' : '#fff';
                             @endphp
                             <tr class="{{ $task->is_completed ? 'completed' : '' }}">
@@ -87,19 +96,16 @@
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <!-- タイトル -->
                                         <a href="/tasks/{{ $task->id }}" class="text-dark fw-bold text-decoration-none">
                                             {{ $task->title }}
                                         </a>
-                                        <!-- 状態バッジ（期限と同じ色を適用） -->
-                                        <span class="badge ms-2 badge-status shadow-sm" 
-                                              style="background-color: {{ $color }}; color: {{ $textColor }}; border: none;">
+                                        <span class="badge ms-2 badge-status" style="background-color: {{ $color }}; color: {{ $textColor }};">
                                             {{ $task->status ?: '未入力' }}
                                         </span>
                                     </div>
                                 </td>
                                 <td class="text-center">
-                                    <span style="color: {{ $color }}; font-weight: bold; font-size: 0.85rem;">
+                                    <span style="color: {{ $color }}; font-weight: bold; font-size: 0.8rem;">
                                         {{ $task->due_date ? date('m/d', strtotime($task->due_date)) : '-' }}
                                     </span>
                                 </td>
@@ -111,9 +117,13 @@
             </div>
         </div>
 
-        <!-- 右側：カレンダー (幅 7/12) -->
+        <!-- 右側：カレンダー -->
         <div class="col-lg-7 px-3">
-            <div id='calendar' class="shadow-sm border-0"></div>
+            <div class="card dashboard-card p-3">
+                <div id='calendar-container'>
+                    <div id='calendar'></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -124,8 +134,13 @@ document.addEventListener('DOMContentLoaded', function() {
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'ja',
-        height: '100%',
+        height: 'auto', // 親要素の高さに依存させず、コンテンツに合わせる
         handleWindowResize: true,
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek'
+        },
         events: [
             @foreach($tasks as $task)
             @if($task->due_date)
@@ -134,7 +149,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 start: '{{ $task->due_date }}',
                 url: '/tasks/{{ $task->id }}',
                 @php
-                    // カレンダーの色も同様のロジックで算出
                     $hex = '#6c757d';
                     if (!$task->is_completed) {
                         $diff = \Carbon\Carbon::now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($task->due_date), false);
