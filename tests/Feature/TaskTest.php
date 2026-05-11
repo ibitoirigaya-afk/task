@@ -12,7 +12,7 @@ class TaskTest extends TestCase
     use RefreshDatabase;
 
     /** @test */
-    public function タスクが正常に作成できること()
+    public function test_タスクが正常に作成できること()
     {
         // 1. 投稿データを用意
         $data = [
@@ -37,7 +37,7 @@ class TaskTest extends TestCase
     }
 
     /** @test */
-    public function タイトルが空の場合はバリデーションエラーになること()
+    public function test_タイトルが空の場合はバリデーションエラーになること()
     {
         $response = $this->post('/tasks', ['title' => '']);
         
