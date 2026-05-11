@@ -21,3 +21,5 @@ Route::get('/tasks', [TaskController::class, 'index']);
 
 // 削除処理
 Route::delete('/tasks/{id}', [TaskController::class, 'destroy']);
+
+Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggle']);

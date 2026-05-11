@@ -1,17 +1,22 @@
 <?php
-  namespace App\Models;
 
-  use Illuminate\Database\Eloquent\Factories\HasFactory;
-  use Illuminate\Database\Eloquent\Model;
+namespace App\Models;
 
-  class Task extends Model
-  {
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Task extends Model
+{
     use HasFactory;
 
-    // 編集可能な属性を指定
+    /**
+     * 一括代入（Mass Assignment）を許可する属性
+     * JavaのEntityでいう、セッターやコンストラクタで一括設定できるフィールドの定義です。
+     */
     protected $fillable = [
-      'title',
-      'description',
-      'completed',
+        'title',
+        'description',
+        'is_completed', // チェック状態
+        'due_date',     // 期限
     ];
-  } 
+}

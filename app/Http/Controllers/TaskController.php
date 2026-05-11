@@ -28,11 +28,16 @@ class TaskController extends Controller
     }
 
     // 3. 一覧を表示する（追加分）
-    public function index()
-    {
-        $tasks = Task::all(); 
-        return view('tasks.index', compact('tasks'));
-    }
+public function index()
+{
+    // 1. 期限（due_date）が早い順（昇順：ASC）で取得
+    // 2. ただし、期限が設定されていない（null）ものは最後に回す
+    $tasks = Task::orderByRaw('due_date IS NULL ASC') // nullは後ろへ
+                 ->orderBy('due_date', 'asc')         // 近い日付が上
+                 ->get();
+
+    return view('tasks.index', compact('tasks'));
+}
 
     // 4. 削除する（追加分）
     public function destroy($id)
@@ -42,4 +47,11 @@ class TaskController extends Controller
 
         return redirect('/tasks')->with('success', 'タスクを削除しました。');
     }
+public function toggle(Task $task)
+{
+    $task->update([
+        'is_completed' => !$task->is_completed
+    ]);
+    return back(); // 前の画面に戻る
+}
 } // <--- 必ず最後にこの「クラスを閉じるカッコ」があることを確認！
