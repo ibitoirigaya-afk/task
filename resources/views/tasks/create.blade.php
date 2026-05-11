@@ -23,6 +23,10 @@
             <label for="description" class="form-label">説明</label>
             <textarea class="form-control" id="description" name="description"></textarea>
         </div>
+        <div class="mb-3">
+    <label for="status" class="form-label">状態</label>
+    <input type="text" name="status" class="form-control" id="status" placeholder="例: 着手中、確認待ち、保留">
+</div>
 
         <!-- ここ！この「期限」ブロックが2つあったら1つを消してください -->
         <div class="mb-3">
@@ -34,6 +38,7 @@
         <a href="/tasks" class="btn btn-secondary">戻る</a>
     </form>
 </div>
+<input type="text" name="status">
 
 <!-- 2. FlatpickrのJS（カレンダーを動かす仕組み） -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

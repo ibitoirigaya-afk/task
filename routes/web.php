@@ -25,3 +25,4 @@ Route::delete('/tasks/{id}', [TaskController::class, 'destroy']);
 Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggle']);
 
 Route::get('/tasks/{task}', [TaskController::class, 'show']);
+Route::patch('/tasks/{task}/update-status', [TaskController::class, 'updateStatus']);

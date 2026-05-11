@@ -2,65 +2,59 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>タスク詳細 - {{ $task->title }}</title>
-    <!-- デザインを整えるためにBootstrapを読み込み -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .task-card { margin-top: 50px; }
-        .description-box { 
-            background-color: #f8f9fa; 
-            padding: 20px; 
-            border-radius: 8px; 
-            min-height: 150px;
-            white-space: pre-wrap; /* 改行をそのまま表示する設定 */
-        }
-    </style>
 </head>
-<body class="bg-light">
+<body class="bg-light p-5">
 
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-8 task-card">
+        <div class="col-md-8">
             <div class="card shadow">
-                <!-- ヘッダー部分：状態によって色を変える -->
-                <div class="card-header {{ $task->is_completed ? 'bg-secondary' : 'bg-primary' }} text-white d-flex justify-content-between align-items-center">
-                    <h2 class="h5 mb-0">タスク詳細</h2>
-                    <span>{{ $task->is_completed ? '完了済み' : '進行中' }}</span>
+                <div class="card-header bg-dark text-white d-flex justify-content-between">
+                    <span>タスク詳細</span>
+                    <span>ID: {{ $task->id }}</span>
                 </div>
-
                 <div class="card-body">
-                    <h1 class="mb-3">{{ $task->title }}</h1>
-                    
+                    <!-- 状態更新用のフォーム -->
+                    <form action="/tasks/{{ $task->id }}/update-status" method="POST" class="mb-4">
+                        @csrf
+                        @method('PATCH')
+                        
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-8">
+                                <h1 class="h3 mb-3">{{ $task->title }}</h1>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <label class="form-label small text-muted">現在の状態</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="text" name="status" class="form-control" value="{{ $task->status }}" placeholder="例: 実行中">
+                                    <button class="btn btn-primary" type="submit">更新</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <hr>
+
                     <div class="mb-4">
-                        <span class="text-muted">期限：</span>
-                        <span class="badge bg-info text-dark p-2">
-                            {{ $task->due_date ?? '未設定' }}
-                        </span>
+                        <label class="text-muted small d-block">期限</label>
+                        <span class="badge bg-info text-dark">{{ $task->due_date ?? '未設定' }}</span>
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label text-muted">説明・メモ：</label>
-                        <div class="description-box border">
-                            {{ $task->description ?: '説明はありません。' }}
-                        </div>
+                        <label class="text-muted small d-block">説明</label>
+                        <div class="p-3 border rounded bg-light" style="white-space: pre-wrap;">{{ $task->description ?: '説明はありません。' }}</div>
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <a href="/tasks" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-left"></i> 一覧に戻る
-                        </a>
+                        <a href="/tasks" class="btn btn-secondary">戻る</a>
                         
-                        <!-- 編集ボタン（後で作る場合のために用意） -->
-                        <div class="btn-group">
-                            <form action="/tasks/{{ $task->id }}/toggle" method="POST" class="d-inline">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="btn {{ $task->is_completed ? 'btn-warning' : 'btn-success' }}">
-                                    {{ $task->is_completed ? '未完了に戻す' : '完了にする' }}
-                                </button>
-                            </form>
-                        </div>
+                        <form action="/tasks/{{ $task->id }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('本当に削除しますか？')">削除する</button>
+                        </form>
                     </div>
                 </div>
             </div>
