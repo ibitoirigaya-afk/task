@@ -7,55 +7,70 @@ use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    // 1. 入力画面を表示
+    public function index()
+    {
+        // 期限順に並び替え（期限なしは最後）
+        $tasks = Task::orderByRaw('due_date IS NULL ASC')
+                     ->orderBy('due_date', 'asc')
+                     ->get();
+
+        return view('tasks.index', compact('tasks'));
+    }
+
     public function create()
     {
         return view('tasks.create');
     }
 
-    // 2. 保存処理
     public function store(Request $request)
     {
         $request->validate([
             'title' => 'required|max:255',
             'description' => 'nullable',
+            'status' => 'nullable|max:100', // 追加
         ]);
 
         Task::create($request->all());
 
-        // 保存後は「一覧画面（/tasks）」に飛ばす
         return redirect('/tasks')->with('success', 'タスクが作成されました。');
     }
 
-    // 3. 一覧を表示する（追加分）
-public function index()
-{
-    // 1. 期限（due_date）が早い順（昇順：ASC）で取得
-    // 2. ただし、期限が設定されていない（null）ものは最後に回す
-    $tasks = Task::orderByRaw('due_date IS NULL ASC') // nullは後ろへ
-                 ->orderBy('due_date', 'asc')         // 近い日付が上
-                 ->get();
+    public function show(Task $task)
+    {
+        return view('tasks.show', compact('task'));
+    }
 
-    return view('tasks.index', compact('tasks'));
-}
+    public function toggle(Task $task)
+    {
+        $task->update(['is_completed' => !$task->is_completed]);
+        return back();
+    }
 
-    // 4. 削除する（追加分）
     public function destroy($id)
     {
-        $task = Task::findOrFail($id);
-        $task->delete();
-
+        Task::findOrFail($id)->delete();
         return redirect('/tasks')->with('success', 'タスクを削除しました。');
     }
-public function toggle(Task $task)
+    public function updateStatus(Request $request, Task $task)
 {
     $task->update([
-        'is_completed' => !$task->is_completed
+        'status' => $request->status
     ]);
-    return back(); // 前の画面に戻る
+
+    return back()->with('success', '状態を更新しました！');
 }
-public function show(Task $task)
+public function update(Request $request, Task $task)
 {
-    return view('tasks.show', compact('task'));
+    $request->validate([
+        'title' => 'required|max:255',
+        'status' => 'nullable|max:100',
+        'due_date' => 'nullable|date',
+        'description' => 'nullable',
+    ]);
+
+    // 全項目を更新
+    $task->update($request->all());
+
+    return redirect('/tasks')->with('success', 'タスクを更新しました！');
 }
-} // <--- 必ず最後にこの「クラスを閉じるカッコ」があることを確認！
+}
