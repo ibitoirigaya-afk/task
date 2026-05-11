@@ -54,4 +54,8 @@ public function toggle(Task $task)
     ]);
     return back(); // 前の画面に戻る
 }
+public function show(Task $task)
+{
+    return view('tasks.show', compact('task'));
+}
 } // <--- 必ず最後にこの「クラスを閉じるカッコ」があることを確認！
