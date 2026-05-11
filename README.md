@@ -30,3 +30,51 @@ Server running on [[http://127.0.0.1:8000](http://127.0.0.1:8000)]
 (例)タスク作成画面」を確認するには、URLの末尾に /tasks/create を付け足します。  
 ブラウザに入力するURL：  
 [http://127.0.0.1:8000/tasks/create](http://127.0.0.1:8000/tasks/create)
+
+## 内容変更について
+
+
+- まずブランチを切り替える
+- 全体でいい場合は全体をステージング
+
+
+```bash
+git add .
+```
+
+- コミットと変更点を書く
+
+
+```bash
+git commit -m "変更内容"
+```
+
+
+- pushで共有
+
+
+```bash
+git push
+```
+
+
+- pullで変更を取り入れる
+
+
+```bash
+git pull
+```
+
+
+- 変更内容を反映する
+
+
+```bash
+git merge main
+```
+
+
+- 相手(チーム)に送信
+
+
+Pull requestsからNew pull requestsを押し、相手を選択し送信。
