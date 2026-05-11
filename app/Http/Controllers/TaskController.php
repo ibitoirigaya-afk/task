@@ -59,4 +59,18 @@ class TaskController extends Controller
 
     return back()->with('success', '状態を更新しました！');
 }
+public function update(Request $request, Task $task)
+{
+    $request->validate([
+        'title' => 'required|max:255',
+        'status' => 'nullable|max:100',
+        'due_date' => 'nullable|date',
+        'description' => 'nullable',
+    ]);
+
+    // 全項目を更新
+    $task->update($request->all());
+
+    return redirect('/tasks')->with('success', 'タスクを更新しました！');
+}
 }
